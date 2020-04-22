@@ -19,7 +19,7 @@ Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
 #endregion Apache License Version 2.0
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Senparc.CO2NET.HttpUtility;
+using Senparc.CO2NET.AspNet.HttpUtility;
 using Senparc.CO2NET.Tests;
 using System;
 using System.Collections.Generic;
@@ -56,7 +56,7 @@ namespace Senparc.CO2NET.HttpUtility.Tests
 
             var cookieContainer = new CookieContainer();
             var url = "https://localhost:44335/ForTest/PostTest";//使用.NET 4.5的Sample
-            var result = RequestUtility.HttpPost(url,
+            var result = RequestUtility.HttpPost(BaseTest.serviceProvider, url,
                 cookieContainer, stream, useAjax: true);
 
             Console.WriteLine(result);
@@ -76,7 +76,7 @@ namespace Senparc.CO2NET.HttpUtility.Tests
 
             var cookieContainer = new CookieContainer();
             var url = "https://localhost:44335/ForTest/PostTest";//使用.NET 4.5的Sample
-            var result = RequestUtility.HttpResponsePost(url,
+            var result = RequestUtility.HttpResponsePost(BaseTest.serviceProvider, url,
                 cookieContainer, stream, useAjax: true);
 
             Assert.IsNotNull(result);
@@ -104,7 +104,7 @@ namespace Senparc.CO2NET.HttpUtility.Tests
                 stream.Seek(0, SeekOrigin.Begin);
 
                 var url = "https://localhost:44335/ForTest/PostTest";//使用.NET 4.5的Sample
-                var result = RequestUtility.HttpResponsePost(url,cookieContainer, stream, useAjax: true);
+                var result = RequestUtility.HttpResponsePost(BaseTest.serviceProvider, url,cookieContainer, stream, useAjax: true);
 
                 Assert.IsNotNull(result);
                 var resultString = result.Result.Content.ReadAsStringAsync().GetAwaiter().GetResult();

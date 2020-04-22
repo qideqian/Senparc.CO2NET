@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
   
     文件名：Config.cs
     文件功能描述：全局配置文件
@@ -39,6 +39,9 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
  
     修改标识：Senparc - 20180830
     修改描述：v0.2.9 优化 Config.RootDictionaryPath 方法，可自动获取默认值
+
+    修改标识：Senparc - 20180911
+    修改描述：v0.8.10 提供 Config.HostingEnvironment 属性 
    
 ----------------------------------------------------------------*/
 
@@ -121,9 +124,9 @@ namespace Senparc.CO2NET
         {
             get
             {
-                if (_rootDictionaryPath==null)
+                if (_rootDictionaryPath == null)
                 {
-#if NET35 || NET40 || NET45
+#if NET45
                     var appPath = AppDomain.CurrentDomain.BaseDirectory;
 
                     if (Regex.Match(appPath, $@"[\\/]$", RegexOptions.Compiled).Success)

@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：RegisterService.cs
     文件功能描述：Senparc.CO2NET SDK 快捷注册流程
@@ -40,13 +40,14 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
     修改标识：Senparc - 20190108
     修改描述：v0.5.0 添加 Start() 重写方法，提供 .NET Core Console 的全面支持
 
+    修改标识：Senparc - 20180911
+    修改描述：v0.8.10 RegisterService.Start() 方法开始记录 evn 参数到 Config.HostingEnvironment 属性 
+   
 ----------------------------------------------------------------*/
 
 
-#if NETSTANDARD2_0
-using Microsoft.AspNetCore.Hosting;
+#if !NET45
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 #endif
 
 using System;
@@ -66,7 +67,9 @@ namespace Senparc.CO2NET.RegisterServices
     /// </summary>
     public class RegisterService : IRegisterService
     {
-        //private RegisterService() : this(null) { }
+        public static RegisterService Object { get; internal set; }
+
+        private RegisterService() : this(null) { }
 
         private RegisterService(SenparcSetting senparcSetting)
         {
@@ -74,7 +77,7 @@ namespace Senparc.CO2NET.RegisterServices
             Senparc.CO2NET.Config.SenparcSetting = senparcSetting ?? new SenparcSetting();
         }
 
-#if NETSTANDARD2_0
+#if !NET45
 
         /// <summary>
         /// 单个实例引用全局的 ServiceCollection
@@ -84,39 +87,16 @@ namespace Senparc.CO2NET.RegisterServices
         /// <summary>
         /// 开始 Senparc.CO2NET SDK 初始化参数流程（.NET Core）
         /// </summary>
-        /// <param name="env">IHostingEnvironment，控制台程序可以输入null，</param>
         /// <param name="senparcSetting"></param>
         /// <returns></returns>
-        public static RegisterService Start(IHostingEnvironment env, SenparcSetting senparcSetting)
+        public static RegisterService Start(SenparcSetting senparcSetting)
         {
-
-            //提供网站根目录
-            if (env != null && env.ContentRootPath != null)
-            {
-                Senparc.CO2NET.Config.RootDictionaryPath = env.ContentRootPath;
-            }
-            else
-            {
-                Senparc.CO2NET.Config.RootDictionaryPath = AppDomain.CurrentDomain.BaseDirectory;
-            }
-
             var register = new RegisterService(senparcSetting);
 
             //如果不注册此线程，则AccessToken、JsTicket等都无法使用SDK自动储存和管理。
             register.RegisterThreads();//默认把线程注册好
 
             return register;
-        }
-
-        /// <summary>
-        /// 开始 Senparc.CO2NET SDK 初始化参数流程（.NET Core）
-        /// </summary>
-        /// <param name="env">IHostingEnvironment，控制台程序可以输入null，</param>
-        /// <param name="senparcSetting"></param>
-        /// <returns></returns>
-        public static RegisterService Start(SenparcSetting senparcSetting)
-        {
-            return Start(null, senparcSetting);
         }
 
 #else

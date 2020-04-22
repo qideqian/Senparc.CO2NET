@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：SenparcMessageQueue.cs
     文件功能描述：SenparcMessageQueue消息队列
@@ -40,6 +40,9 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 
     修改标识：Senparc - 20190812
     修改描述：v0.8.8 改用继承 ConcurrentDictionary 后的 MessageQueueDictionary，对方法进行调整
+
+    修改标识：Senparc - 20191009
+    修改描述：v1.0.102 修改 SenparcMessageQueue.GetCurrentKey() 方法
 
 ----------------------------------------------------------------*/
 
@@ -62,7 +65,7 @@ namespace Senparc.CO2NET.MessageQueue
         public static MessageQueueDictionary MessageQueueDictionary = new MessageQueueDictionary();
 
         /// <summary>
-        /// 同步执行锁
+        /// 同步执行锁（注意：此处不使用并发锁，也不实用缓存策略中的本地锁，否则如果在外部锁中记录日志可能会引发死循环）
         /// </summary>
         private static object MessageQueueSyncLock = new object();
         /// <summary>
@@ -112,7 +115,13 @@ namespace Senparc.CO2NET.MessageQueue
         {
             lock (MessageQueueSyncLock)
             {
-                return MessageQueueDictionary.Keys.FirstOrDefault();
+                //不直接使用 Key 是因为 Key 的顺序是不确定的
+                var value = MessageQueueDictionary.Values.OrderBy(z=>z.AddTime).FirstOrDefault();
+                if (value==null)
+                {
+                    return null;
+                }
+                return value.Key;
             }
         }
 

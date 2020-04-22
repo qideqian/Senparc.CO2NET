@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：RegisterService.cs
     文件功能描述：Senparc.Weixin SDK 快捷注册流程
@@ -41,6 +41,9 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
     修改标识：Senparc - 20190521
     修改描述：v0.7.3 .NET Core 提供多证书注册功能
 
+    修改标识：Senparc - 20200220
+    修改描述：v1.1.100 重构 SenparcDI
+
 ----------------------------------------------------------------*/
 
 using System;
@@ -53,7 +56,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.IO;
 
-#if NETSTANDARD2_0
+#if !NET45
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,7 +69,13 @@ namespace Senparc.CO2NET.RegisterServices
     /// </summary>
     public static class RegisterServiceExtension
     {
-#if NETSTANDARD2_0
+#if !NET45 
+
+        /// <summary>
+        /// 是否已经进行过全局注册
+        /// </summary>
+        public static bool SenparcGlobalServicesRegistered { get; set; }
+
         /// <summary>
         /// 注册 IServiceCollection，并返回 RegisterService，开始注册流程（必须）
         /// </summary>
@@ -79,6 +88,7 @@ namespace Senparc.CO2NET.RegisterServices
             SenparcDI.GlobalServiceCollection = serviceCollection;
             serviceCollection.Configure<SenparcSetting>(configuration.GetSection("SenparcSetting"));
 
+            // .net core 3.0 HttpClient 文档参考：https://docs.microsoft.com/zh-cn/aspnet/core/fundamentals/http-requests?view=aspnetcore-3.0
             //配置 HttpClient，可使用 Head 自定义 Cookie
             serviceCollection.AddHttpClient<SenparcHttpClient>()
             //.ConfigureHttpMessageHandlerBuilder((c) =>
@@ -96,6 +106,12 @@ namespace Senparc.CO2NET.RegisterServices
     "DefaultCacheNamespace": "DefaultCache"
   },
              */
+
+            SenparcGlobalServicesRegistered = true;
+
+            //var serviceProvider  = serviceCollection.BuildServiceProvider();
+            //SenparcDI.GlobalServiceProvider = serviceProvider;
+            //return serviceProvider;
 
             return serviceCollection;
         }
@@ -163,8 +179,8 @@ namespace Senparc.CO2NET.RegisterServices
 
                              return httpClientHandler;
                          });
-             
-            SenparcDI.ResetGlobalIServiceProvider();//重置 GlobalIServiceProvider
+
+            //serviceCollection.ResetGlobalIServiceProvider();//重置 GlobalIServiceProvider
             return serviceCollection;
         }
 

@@ -1,5 +1,5 @@
 ﻿/*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：CacheStrategyDomainWarehouse.cs
     文件功能描述： 领域缓存仓库
@@ -55,7 +55,6 @@ namespace Senparc.CO2NET.Cache
         /// <summary>
         /// 添加或更新缓存策略映射
         /// </summary>
-        /// <param name="domainCacheStrategy"></param>
         /// <param name="item"></param>
         public void AddOrUpdate(CacheStrategyDomainMappingItem item)
         {
@@ -175,7 +174,7 @@ namespace Senparc.CO2NET.Cache
             var scanTypesCount = 0;
             if (autoScanExtensionCacheStrategies)
             {
-                //查找所有扩展缓存
+                //查找所有扩展缓存  TODO:扫描程序可以集中到一个 Helper 或者 Utility 中
                 var types = AppDomain.CurrentDomain.GetAssemblies()
                             .SelectMany(a =>
                             {

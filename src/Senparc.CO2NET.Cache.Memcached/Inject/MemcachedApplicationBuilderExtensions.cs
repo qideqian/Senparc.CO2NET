@@ -1,5 +1,5 @@
 ﻿/*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：MemcachedApplicationBuilderExtensions.cs
     文件功能描述：Memcached 依赖注入设置。
@@ -9,9 +9,7 @@
 
 ----------------------------------------------------------------*/
 
-#if NET45 || NET461
-
-#else
+#if !NET45
 using Enyim.Caching;
 using Microsoft.Extensions.Logging;
 using System;

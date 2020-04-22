@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：Program.cs
     文件功能描述：Console 示例（同样适用于 WinForm 和 WPF）
@@ -34,6 +34,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Senparc.CO2NET.Cache;
 using Senparc.CO2NET.Cache.Memcached;
+using Senparc.CO2NET.Extensions;
 using Senparc.CO2NET.RegisterServices;
 using System;
 
@@ -51,7 +52,7 @@ namespace Senparc.CO2NET.Sample.Consoles
 
             var config = configBuilder.Build();
             Console.WriteLine("完成 ServiceCollection 和 ConfigurationBuilder 初始化");
-            
+
             //更多绑定操作参见：https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.2
             var senparcSetting = new SenparcSetting();
             config.GetSection("SenparcSetting").Bind(senparcSetting);
@@ -153,9 +154,12 @@ namespace Senparc.CO2NET.Sample.Consoles
             #endregion
 
             Console.WriteLine("Hello CO2NET!");
-            Console.WriteLine($"Total initialization time: {(SystemTime.Now - dt1).TotalMilliseconds}ms");
+            Console.WriteLine($"Total initialization time: {SystemTime.DiffTotalMS(dt1)}ms");
 
             Console.WriteLine($"当前缓存策略: {CacheStrategyFactory.GetObjectCacheStrategyInstance()}");
+
+            Console.WriteLine($"SenparcSetting: {Config.SenparcSetting.ToJson(true)}");
+
 
             Console.ReadLine();
         }

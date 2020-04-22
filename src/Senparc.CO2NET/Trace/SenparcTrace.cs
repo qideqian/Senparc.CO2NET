@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
   
     文件名：SenparcTrace.cs
     文件功能描述：Senparc.CO2NET 日志记录
@@ -35,6 +35,9 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 
     修改标识：Senparc - 20181227
     修改描述：v0.4.4 提供 SenparcTrace.RecordAPMLog 参数
+
+    修改标识：Senparc - 20181227
+    修改描述：v0.8.9 提供 AutoUnlockLogFile 参数，并针对日志文件可能被占用的情况尝试自动解锁
 
     修改标识：Senparc - 20181227
     修改描述：v0.8.9 提供 AutoUnlockLogFile 参数，并针对日志文件可能被占用的情况尝试自动解锁
@@ -103,7 +106,7 @@ namespace Senparc.CO2NET.Trace
         /// </summary>
         protected static Action<string> _queue = async (logStr) =>
         {
-            using (await Cache.BeginCacheLockAsync(LockName, ""))
+            using (await Cache.BeginCacheLockAsync(LockName, "").ConfigureAwait(false))
             {
                 string logDir;
 #if NET35

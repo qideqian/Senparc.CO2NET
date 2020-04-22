@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：LocalContainerCacheStrategy.cs
     文件功能描述：本地容器缓存。
@@ -48,77 +48,16 @@ using System.Text;
 using Senparc.CO2NET.Cache;
 using Senparc.CO2NET.Exceptions;
 using System.Threading.Tasks;
-#if NET35 || NET40 || NET45
+#if NET45
 using System.Web;
 #else
 using Microsoft.Extensions.Caching.Memory;
+
 #endif
 
 
 namespace Senparc.CO2NET.Cache
 {
-    /// <summary>
-    /// 全局静态数据源帮助类
-    /// </summary>
-    public static class LocalObjectCacheHelper
-    {
-#if NET35 || NET40 || NET45
-        /// <summary>
-        /// 所有数据集合的列表
-        /// </summary>
-        public static System.Web.Caching.Cache LocalObjectCache { get; set; }
-
-        static LocalObjectCacheHelper()
-        {
-            LocalObjectCache = System.Web.HttpRuntime.Cache;
-        }
-#else
-
-        private static IMemoryCache _localObjectCache;
-
-        /// <summary>
-        /// 所有数据集合的列表
-        /// </summary>
-        public static IMemoryCache LocalObjectCache
-        {
-            get
-            {
-                if (_localObjectCache == null)
-                {
-                    _localObjectCache = SenparcDI.GetService<IMemoryCache>();
-
-                    if (_localObjectCache == null)
-                    {
-                        throw new CacheException("IMemoryCache 依赖注入未设置！请在 Startup.cs 中使用 serviceCollection.AddMemoryCache() 进行设置！");
-                    }
-                }
-                return _localObjectCache;
-            }
-        }
-
-        /// <summary>
-        /// .NET Core 的 MemoryCache 不提供遍历所有项目的方法，因此这里做一个储存Key的地方
-        /// </summary>
-        public static Dictionary<string, DateTimeOffset> Keys { get; set; } = new Dictionary<string, DateTimeOffset>();
-
-        static LocalObjectCacheHelper()
-        {
-
-        }
-
-        /// <summary>
-        /// 获取储存Keys信息的缓存键
-        /// </summary>
-        /// <param name="cacheStrategy"></param>
-        /// <returns></returns>
-        public static string GetKeyStoreKey(BaseCacheStrategy cacheStrategy)
-        {
-            var keyStoreFinalKey = cacheStrategy.GetFinalKey("CO2NET_KEY_STORE");
-            return keyStoreFinalKey;
-        }
-#endif
-    }
-
     /// <summary>
     /// 本地容器缓存策略
     /// </summary>
@@ -126,7 +65,7 @@ namespace Senparc.CO2NET.Cache
     {
         #region 数据源
 
-#if NET35 || NET40 || NET45
+#if NET45
         private System.Web.Caching.Cache _cache = LocalObjectCacheHelper.LocalObjectCache;
 #else
         private IMemoryCache _cache = LocalObjectCacheHelper.LocalObjectCache;
@@ -190,7 +129,7 @@ namespace Senparc.CO2NET.Cache
 
             var finalKey = base.GetFinalKey(key, isFullKey);
 
-#if NET35 || NET40 || NET45
+#if NET45
             _cache[finalKey] = value;
 #else
             var newKey = !CheckExisted(finalKey, true);
@@ -257,7 +196,7 @@ namespace Senparc.CO2NET.Cache
 
             var cacheKey = GetFinalKey(key, isFullKey);
 
-#if NET35 || NET40 || NET45
+#if NET45
             return _cache[cacheKey];
 #else
             return _cache.Get(cacheKey);
@@ -285,7 +224,7 @@ namespace Senparc.CO2NET.Cache
 
             var cacheKey = GetFinalKey(key, isFullKey);
 
-#if NET35 || NET40 || NET45
+#if NET45
             return (T)_cache[cacheKey];
 #else
             return _cache.Get<T>(cacheKey);
@@ -295,7 +234,7 @@ namespace Senparc.CO2NET.Cache
         public IDictionary<string, object> GetAll()
         {
             IDictionary<string, object> data = new Dictionary<string, object>();
-#if NET35 || NET40 || NET45
+#if NET45
             IDictionaryEnumerator cacheEnum = System.Web.HttpRuntime.Cache.GetEnumerator();
 
             while (cacheEnum.MoveNext())
@@ -322,7 +261,7 @@ namespace Senparc.CO2NET.Cache
         {
             var cacheKey = GetFinalKey(key, isFullKey);
 
-#if NET35 || NET40 || NET45
+#if NET45
             return _cache.Get(cacheKey) != null;
 #else
             return _cache.Get(cacheKey) != null;
@@ -331,7 +270,7 @@ namespace Senparc.CO2NET.Cache
 
         public long GetCount()
         {
-#if NET35 || NET40 || NET45
+#if NET45
             return _cache.Count;
 #else
             var keyStoreFinalKey = LocalObjectCacheHelper.GetKeyStoreKey(this);

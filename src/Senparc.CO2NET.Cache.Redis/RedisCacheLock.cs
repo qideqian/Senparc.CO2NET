@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：RedisCacheLock.cs
     文件功能描述：本地锁
@@ -38,7 +38,6 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 using System;
 using System.Threading.Tasks;
 using Redlock.CSharp;
-using Senparc.CO2NET.Cache;
 
 namespace Senparc.CO2NET.Cache.Redis
 {
@@ -112,7 +111,7 @@ namespace Senparc.CO2NET.Cache.Redis
         /// <returns></returns>
         public static async Task<ICacheLock> CreateAndLockAsync(IBaseCacheStrategy strategy, string resourceName, string key, int? retryCount = null, TimeSpan? retryDelay = null)
         {
-            return await new RedisCacheLock(strategy as BaseRedisObjectCacheStrategy, resourceName, key, retryCount, retryDelay).LockAsync();
+            return await new RedisCacheLock(strategy as BaseRedisObjectCacheStrategy, resourceName, key, retryCount, retryDelay).LockAsync().ConfigureAwait(false);
         }
 
 

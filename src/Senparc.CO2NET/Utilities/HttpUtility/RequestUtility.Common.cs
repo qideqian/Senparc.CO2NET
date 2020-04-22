@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：RequestUtility.cs
     文件功能描述：获取请求结果
@@ -64,6 +64,9 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
     修改标识：Senparc - 20190521
     修改描述：v0.8.4 HttpUtility.HttpPost_Common_NetCore 所调用的额 CreateFileContent 取消对 fileName 参数的 UrlEncode 编码
 
+    修改标识：Senparc - 20190928
+    修改描述：v1.0.101 RequestUtility.GetRequestMemoryStream() 增加对 .NET Core 3.0 AllowSynchronousIO 的设置
+
 ----------------------------------------------------------------*/
 
 using System;
@@ -76,17 +79,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Senparc.CO2NET.Helpers;
 using Senparc.CO2NET.WebProxy;
-#if NET35 || NET40 || NET45
+#if NET45
 using System.Web;
 #else
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Senparc.CO2NET.Extensions;
 #endif
-#if NETSTANDARD2_0
-using Microsoft.AspNetCore.Http;
-#endif
-
 
 namespace Senparc.CO2NET.HttpUtility
 {
@@ -97,7 +96,7 @@ namespace Senparc.CO2NET.HttpUtility
     {
         #region 代理
 
-#if NET35 || NET40 || NET45
+#if NET45
         private static System.Net.WebProxy _webproxy = null;
         /// <summary>
         /// 设置Web代理
@@ -155,18 +154,7 @@ namespace Senparc.CO2NET.HttpUtility
             SenparcHttpClientWebProxy = null;
         }
 
-        /// <summary>
-        /// 从 Request.Body 中读取流，并复制到一个独立的 MemoryStream 对象中
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static Stream GetRequestMemoryStream(this HttpRequest request)
-        {
-            string body = new StreamReader(request.Body).ReadToEnd();
-            byte[] requestData = Encoding.UTF8.GetBytes(body);
-            Stream inputStream = new MemoryStream(requestData);
-            return inputStream;
-        }
+
 #endif
 
         #endregion
@@ -187,7 +175,7 @@ namespace Senparc.CO2NET.HttpUtility
             return true;
         }
 
-#if NET35 || NET40 || NET45
+#if NET45
         /// <summary>
         /// 设置HTTP头
         /// </summary>

@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：LocalCacheLock.cs
     文件功能描述：本地锁
@@ -162,13 +162,15 @@ namespace Senparc.CO2NET.Cache
         /// <returns></returns>
         public static async Task<ICacheLock> CreateAndLockAsync(IBaseCacheStrategy strategy, string resourceName, string key, int? retryCount = null, TimeSpan? retryDelay = null)
         {
-            return await new LocalCacheLock(strategy as LocalObjectCacheStrategy, resourceName, key, retryCount, retryDelay).LockAsync();
+           return  await new LocalCacheLock(strategy as LocalObjectCacheStrategy, resourceName, key, retryCount, retryDelay).LockAsync().ConfigureAwait(false);
         }
+
         public override async Task<ICacheLock> LockAsync()
         {
             //TODO：异常处理
 
-            return await Task.Factory.StartNew(() => Lock()).ConfigureAwait(false);
+            //return await Task.Factory.StartNew(() => Lock()).ConfigureAwait(false);
+            return Lock();//此处使用同步方法，完成锁定
         }
 
         public override Task UnLockAsync()

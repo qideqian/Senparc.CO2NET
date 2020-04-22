@@ -19,7 +19,7 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
 #endregion Apache License Version 2.0
 
 /*----------------------------------------------------------------
-    Copyright (C) 2019 Senparc
+    Copyright (C) 2020 Senparc
 
     文件名：SenparcHttpClient.cs
     文件功能描述：SenparcHttpClient，用于提供 HttpClientFactory 的自定义类
@@ -30,11 +30,14 @@ Detail: https://github.com/Senparc/Senparc.CO2NET/blob/master/LICENSE
     修改标识：Senparc - 20190521
     修改描述：v0.7.3 .NET Core 提供多证书注册功能
 
+    修改标识：Senparc - 20200220
+    修改描述：v1.1.100 重构 SenparcDI
 
 ----------------------------------------------------------------*/
 
 
-#if NETSTANDARD2_0
+#if !NET45
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -60,16 +63,16 @@ namespace Senparc.CO2NET.HttpUtility
         /// </summary>
         /// <param name="httpClientName"></param>
         /// <returns></returns>
-        public static SenparcHttpClient GetInstanceByName(string httpClientName)
+        public static SenparcHttpClient GetInstanceByName(IServiceProvider serviceProvider, string httpClientName)
         {
             if (!string.IsNullOrEmpty(httpClientName))
             {
-                var clientFactory = SenparcDI.GetRequiredService<IHttpClientFactory>();
+                var clientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                 var httpClient = clientFactory.CreateClient(httpClientName);
                 return new SenparcHttpClient(httpClient);
             }
 
-            return SenparcDI.GetRequiredService<SenparcHttpClient>(true);
+            return serviceProvider.GetRequiredService<SenparcHttpClient>();
         }
 
         /// <summary>
